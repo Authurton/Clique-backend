@@ -29,6 +29,16 @@ ALLOWED_HOSTS = ['*']
 
 
 # Application definition
+CSRF_COOKIE_HTTPONLY = True
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',  # React frontend origin
+]
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'  
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # React frontend origin
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -49,6 +59,10 @@ from firebase_admin import credentials
 cred = credentials.Certificate('firebase_credentials.json')
 firebase_admin.initialize_app(cred)
 
+
+ 
+AUTH_USER_MODEL = 'users.User'
+SESSION_COOKIE_SAMESITE = None
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
