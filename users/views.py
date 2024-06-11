@@ -91,18 +91,15 @@ class GroupViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'])
     def join(self, request, pk=None):
-        # Get the group instance
         group = self.get_object()
         
-        # Assuming userId is sent in the request data
         user_id = request.data.get('userId')
 
-        # Assuming you have a ManyToMany relationship between Group and User
         try:
             user = User.objects.get(id=user_id)
             group.users.add(user)
-            # You may want to customize the response data as needed
-            return Response({'message': f'User {user_id} joined group {pk}'}, status=status.HTTP_200_OK)
+            group_serializer = GroupSerializer(group)
+            return Response(group_serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
