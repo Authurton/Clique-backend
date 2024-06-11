@@ -30,11 +30,16 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Strict'  # or 'Lax' for development
+CSRF_COOKIE_SECURE = True  # False for development, True for production
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',  # React frontend origin
 ]
+
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'  
+SESSION_COOKIE_SAMESITE = 'Strict'  # or 'Lax' for development
+SESSION_COOKIE_SECURE = True  # False for development, True for production
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # React frontend origin
@@ -62,7 +67,7 @@ firebase_admin.initialize_app(cred)
 
  
 AUTH_USER_MODEL = 'users.User'
-SESSION_COOKIE_SAMESITE = None
+# SESSION_COOKIE_SAMESITE = None
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

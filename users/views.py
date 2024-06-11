@@ -70,11 +70,12 @@ class UserViewSet(viewsets.ModelViewSet):
         
     @action(detail=False, methods=['post'])
     def logout(self, request):
-        # Log out the current user
         logout(request)
-        # Clear the session cookie
+        
         response = Response({'message': 'Logged out successfully'})
         response.delete_cookie(settings.SESSION_COOKIE_NAME)
+        response['X-CSRFToken'] = get_token(request)
+        
         return response
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -87,3 +88,22 @@ class GroupViewSet(viewsets.ModelViewSet):
         users = group.users.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def join(self, request, pk=None):
+        # Get the group instance
+        group = self.get_object()
+        
+        # Assuming userId is sent in the request data
+        user_id = request.data.get('userId')
+
+        # Assuming you have a ManyToMany relationship between Group and User
+        try:
+            user = User.objects.get(id=user_id)
+            group.users.add(user)
+            # You may want to customize the response data as needed
+            return Response({'message': f'User {user_id} joined group {pk}'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
