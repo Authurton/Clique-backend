@@ -5,6 +5,7 @@ from .models import User, Group
 from .serializers import UserSerializer, GroupSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.mixins import UpdateModelMixin
 import firebase_admin
 from firebase_admin import firestore
 from django.conf import settings
@@ -27,6 +28,19 @@ class UserViewSet(viewsets.ModelViewSet):
         user_data = request.data
         db.collection('users').add(user_data)
         return response
+    
+    def partial_update(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            kwargs['partial'] = True
+            return super().partial_update(request, *args, **kwargs)
+        else:
+            return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    def destroy(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
     
     @action(detail=False, methods=['post'])
     def login(self, request):
