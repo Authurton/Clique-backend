@@ -70,7 +70,6 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def current_user(self, request):
         user = request.user
-        print(user, 'logged in user')
         if user.is_authenticated:
             groups = user.group_set.values('id', 'group_name')
             user_data = {
