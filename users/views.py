@@ -91,6 +91,21 @@ class UserViewSet(viewsets.ModelViewSet):
         response['X-CSRFToken'] = get_token(request)
         
         return response
+    
+    @action(detail=True, methods=['post'])
+    def leave_group(self, request, pk=None):
+        user = self.get_object()
+        group_id = request.data.get('group_id')
+
+        if group_id:
+            try:
+                group = Group.objects.get(id=group_id)
+                user.group_set.remove(group)  
+                user.save()
+                return Response({'status': 'group left'}, status=status.HTTP_204_NO_CONTENT)
+            except Group.DoesNotExist:
+                return Response({'error': 'Group not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'group_id not provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
